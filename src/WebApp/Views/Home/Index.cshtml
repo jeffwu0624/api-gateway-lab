@@ -1,0 +1,40 @@
+@model WebApp.Models.ApiResultViewModel
+@{
+    ViewData["Title"] = "API Gateway Lab";
+}
+
+<div class="text-center mb-4">
+    <h1 class="display-4">API Gateway Lab</h1>
+    <p class="lead">點擊按鈕透過 API Gateway 取得 Token 並呼叫後端 API</p>
+    <form asp-action="CallApi" method="post">
+        <button type="submit" class="btn btn-primary btn-lg">呼叫 API</button>
+    </form>
+</div>
+
+@if (Model.HasResult)
+{
+    @if (Model.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">@Model.ErrorMessage</div>
+    }
+
+    @if (Model.TokenJson != null)
+    {
+        <div class="card mb-3">
+            <div class="card-header"><strong>Step 1: POST /api/token</strong> — 取得 Token</div>
+            <div class="card-body">
+                <pre class="mb-0"><code>@Model.TokenJson</code></pre>
+            </div>
+        </div>
+    }
+
+    @if (Model.OrdersJson != null)
+    {
+        <div class="card mb-3">
+            <div class="card-header"><strong>Step 2: GET /api/orders</strong> — 取得訂單</div>
+            <div class="card-body">
+                <pre class="mb-0"><code>@Model.OrdersJson</code></pre>
+            </div>
+        </div>
+    }
+}
