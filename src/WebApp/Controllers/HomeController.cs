@@ -15,6 +15,7 @@ public class HomeController(IHttpClientFactory httpClientFactory) : Controller
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> CallApi()
     {
         var vm = new ApiResultViewModel();
@@ -56,7 +57,9 @@ public class HomeController(IHttpClientFactory httpClientFactory) : Controller
         }
         catch (Exception ex)
         {
-            vm.ErrorMessage = $"連線失敗: {ex.Message}";
+            vm.ErrorMessage = ex is HttpRequestException
+                ? "無法連線至 API Gateway，請確認服務已啟動"
+                : "呼叫 API 時發生錯誤";
         }
 
         return View("Index", vm);
