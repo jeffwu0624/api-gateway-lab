@@ -30,5 +30,18 @@ public class IssueTokenUseCase(
     }
 
     private static string NormalizeWindowsUsername(string raw)
-        => (raw.Contains('\\') ? raw.Split('\\')[1] : raw).ToLowerInvariant();
+    {
+        if (string.IsNullOrWhiteSpace(raw))
+            throw new UnauthorizedAccessException("invalid_windows_username");
+
+        var normalized = raw.Trim();
+        var separatorIndex = normalized.IndexOf('\\');
+        if (separatorIndex >= 0)
+            normalized = normalized[(separatorIndex + 1)..].Trim();
+
+        if (string.IsNullOrWhiteSpace(normalized))
+            throw new UnauthorizedAccessException("invalid_windows_username");
+
+        return normalized.ToLowerInvariant();
+    }
 }

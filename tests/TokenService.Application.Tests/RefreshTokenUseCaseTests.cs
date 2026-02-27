@@ -78,4 +78,14 @@ public class RefreshTokenUseCaseTests
             () => Sut().ExecuteAsync(rawRt));
         ex.Message.Should().Be("token_expired");
     }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    public async Task Execute_InvalidRefreshToken_ThrowsUnauthorized(string input)
+    {
+        var ex = await Assert.ThrowsAsync<UnauthorizedAccessException>(
+            () => Sut().ExecuteAsync(input));
+        ex.Message.Should().Be("invalid_token");
+    }
 }

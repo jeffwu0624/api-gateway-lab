@@ -16,6 +16,9 @@ public class RefreshTokenUseCase(
 
     public async Task<TokenResponse> ExecuteAsync(string rawRefreshToken, CancellationToken ct = default)
     {
+        if (string.IsNullOrWhiteSpace(rawRefreshToken))
+            throw new UnauthorizedAccessException("invalid_token");
+
         var hash = RefreshTokenHasher.ComputeHex(rawRefreshToken);
         var rt = await refreshTokens.FindByHashAsync(hash, ct)
             ?? throw new UnauthorizedAccessException("invalid_token");

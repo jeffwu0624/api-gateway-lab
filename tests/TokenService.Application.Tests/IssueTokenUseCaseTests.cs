@@ -55,4 +55,16 @@ public class IssueTokenUseCaseTests
 
         _users.Verify(r => r.FindByUsernameAsync(expected, default), Times.Once);
     }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    [InlineData(@"CORP\")]
+    [InlineData(@"CORP\   ")]
+    public async Task Execute_InvalidUsername_ThrowsUnauthorized(string input)
+    {
+        var ex = await Assert.ThrowsAsync<UnauthorizedAccessException>(
+            () => Sut().ExecuteAsync(input));
+        ex.Message.Should().Be("invalid_windows_username");
+    }
 }
