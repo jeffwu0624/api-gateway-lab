@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TokenService.Domain.Entities;
 
@@ -20,7 +21,11 @@ public class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
                             (System.Text.Json.JsonSerializerOptions?)null),
                    v => (IReadOnlyList<string>)System.Text.Json.JsonSerializer
                             .Deserialize<List<string>>(v,
-                            (System.Text.Json.JsonSerializerOptions?)null)!)
+                            (System.Text.Json.JsonSerializerOptions?)null)!,
+                   new ValueComparer<IReadOnlyList<string>>(
+                       (a, b) => a != null && b != null && a.SequenceEqual(b),
+                       c => c.Aggregate(0, (h, v) => HashCode.Combine(h, v.GetHashCode())),
+                       c => c.ToList().AsReadOnly()))
                .HasColumnName("RolesJson")
                .HasMaxLength(500)
                .IsRequired();
