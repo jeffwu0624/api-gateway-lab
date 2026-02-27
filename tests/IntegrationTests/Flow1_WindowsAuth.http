@@ -1,0 +1,22 @@
+### Step 1: 取得 AT + RT
+POST http://localhost:5000/api/token
+Content-Type: application/json
+X-Dev-Windows-User: CORP\jeff.wang
+
+{ "grant_type": "windows_identity" }
+
+### Step 2: 呼叫業務 API
+GET http://localhost:5000/api/orders
+Authorization: Bearer {{access_token}}
+
+### Step 3: 換發 Token
+POST http://localhost:5000/api/token/refresh
+Content-Type: application/json
+
+{ "refresh_token": "{{refresh_token}}" }
+
+### Step 4: 重用舊 RT（預期 401）
+POST http://localhost:5000/api/token/refresh
+Content-Type: application/json
+
+{ "refresh_token": "{{old_refresh_token}}" }
