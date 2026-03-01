@@ -198,6 +198,9 @@ publish/
 # in these scripts will be unencrypted
 PublishScripts/
 
+# Lab runtime state
+scripts/.lab-pids.json
+
 # NuGet Packages
 *.nupkg
 # NuGet Symbol Packages

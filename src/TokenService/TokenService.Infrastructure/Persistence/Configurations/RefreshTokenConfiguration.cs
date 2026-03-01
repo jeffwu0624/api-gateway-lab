@@ -12,7 +12,7 @@ public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
         builder.HasKey(r => r.Id);
         builder.Property(r => r.TokenHash).HasMaxLength(100).IsRequired();
 
-        builder.Property<Guid>("RowVersion")
+        builder.Property<string>("RowVersion")
                .IsConcurrencyToken()
                .HasDefaultValueSql("(lower(hex(randomblob(16))))");
 

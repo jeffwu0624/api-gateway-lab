@@ -20,7 +20,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         foreach (var entry in ChangeTracker.Entries<RefreshToken>()
                      .Where(e => e.State == EntityState.Modified))
         {
-            entry.Property("RowVersion").CurrentValue = Guid.NewGuid();
+            entry.Property("RowVersion").CurrentValue = Guid.NewGuid().ToString("N");
         }
         return base.SaveChangesAsync(ct);
     }

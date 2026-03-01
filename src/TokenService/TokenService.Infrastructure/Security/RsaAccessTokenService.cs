@@ -12,10 +12,10 @@ public class RsaAccessTokenService(JwtSettings settings) : IAccessTokenService
 {
     public string Generate(AppUser user)
     {
-        using var rsa = RSA.Create();
-        rsa.ImportFromPem(File.ReadAllText(settings.PrivateKeyPath));
+        // Materialize key parameters first so token creation doesn't hold a disposed RSA instance.
+        var signingKey = CreateSigningKey();
 
-        return new JsonWebTokenHandler().CreateToken(new SecurityTokenDescriptor
+        var token = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity([
                 new Claim(JwtRegisteredClaimNames.Sub, user.Username),
@@ -31,8 +31,16 @@ public class RsaAccessTokenService(JwtSettings settings) : IAccessTokenService
             Audience = settings.Audience,
             IssuedAt = DateTime.UtcNow,
             Expires = DateTime.UtcNow.AddMinutes(settings.AccessTokenMinutes),
-            SigningCredentials = new SigningCredentials(
-                new RsaSecurityKey(rsa), SecurityAlgorithms.RsaSha256)
-        });
+            SigningCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.RsaSha256)
+        };
+
+        return new JsonWebTokenHandler().CreateToken(token);
+    }
+
+    private RsaSecurityKey CreateSigningKey()
+    {
+        using var rsa = RSA.Create();
+        rsa.ImportFromPem(File.ReadAllText(settings.PrivateKeyPath));
+        return new RsaSecurityKey(rsa.ExportParameters(true));
     }
 }
