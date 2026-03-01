@@ -10,8 +10,8 @@ $pidFile = Join-Path $PSScriptRoot '.lab-pids.json'
 
 $services = @(
     @{ Name = 'TokenService'; ProjectDir = Join-Path $repoRoot 'src/TokenService/TokenService.API'; Port = 5001 },
-    @{ Name = 'ApiGateway';   ProjectDir = Join-Path $repoRoot 'src/ApiGateway';                    Port = 5000 },
-    @{ Name = 'SampleApi';    ProjectDir = Join-Path $repoRoot 'src/SampleApi';                     Port = 5002 }
+    @{ Name = 'ApiGateway'; ProjectDir = Join-Path $repoRoot 'src/ApiGateway'; Port = 5000 },
+    @{ Name = 'SampleApi'; ProjectDir = Join-Path $repoRoot 'src/SampleApi'; Port = 5002 }
 )
 
 function Test-PortListening {
