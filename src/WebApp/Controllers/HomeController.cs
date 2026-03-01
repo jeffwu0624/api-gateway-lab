@@ -36,13 +36,14 @@ public class HomeController(IHttpClientFactory httpClientFactory) : Controller
 
             if (!tokenResponse.IsSuccessStatusCode)
             {
-                vm.ErrorMessage = $"Token 請求失敗: {tokenResponse.StatusCode}";
+                AppendError(vm, $"Step 1 失敗 (POST /api/token): {tokenResponse.StatusCode}");
                 return View("Index", vm);
             }
 
-            // 解析 access_token
+            // 解析 access_token / refresh_token
             using var tokenDoc = JsonDocument.Parse(tokenBody);
             var accessToken = tokenDoc.RootElement.GetProperty("access_token").GetString();
+            var refreshToken = tokenDoc.RootElement.GetProperty("refresh_token").GetString();
 
             // Step 2: GET /api/orders 取得訂單
             var ordersRequest = new HttpRequestMessage(HttpMethod.Get, "/api/orders");
@@ -53,7 +54,21 @@ public class HomeController(IHttpClientFactory httpClientFactory) : Controller
             vm.OrdersJson = FormatJson(ordersBody);
 
             if (!ordersResponse.IsSuccessStatusCode)
-                vm.ErrorMessage = $"Orders 請求失敗: {ordersResponse.StatusCode}";
+                AppendError(vm, $"Step 2 失敗 (GET /api/orders): {ordersResponse.StatusCode}");
+
+            // Step 3: POST /api/token/refresh 進行換發
+            var refreshRequest = new HttpRequestMessage(HttpMethod.Post, "/api/token/refresh");
+            refreshRequest.Content = new StringContent(
+                JsonSerializer.Serialize(new { refresh_token = refreshToken }),
+                Encoding.UTF8,
+                "application/json");
+
+            var refreshResponse = await client.SendAsync(refreshRequest);
+            var refreshBody = await refreshResponse.Content.ReadAsStringAsync();
+            vm.RefreshJson = FormatJson(refreshBody);
+
+            if (!refreshResponse.IsSuccessStatusCode)
+                AppendError(vm, $"Step 3 失敗 (POST /api/token/refresh): {refreshResponse.StatusCode}");
         }
         catch (Exception ex)
         {
@@ -82,5 +97,12 @@ public class HomeController(IHttpClientFactory httpClientFactory) : Controller
         {
             return json;
         }
+    }
+
+    private static void AppendError(ApiResultViewModel vm, string message)
+    {
+        vm.ErrorMessage = string.IsNullOrWhiteSpace(vm.ErrorMessage)
+            ? message
+            : $"{vm.ErrorMessage}\n{message}";
     }
 }

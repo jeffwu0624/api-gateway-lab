@@ -15,7 +15,7 @@
 {
     @if (Model.ErrorMessage != null)
     {
-        <div class="alert alert-danger">@Model.ErrorMessage</div>
+        <div class="alert alert-danger" style="white-space: pre-line;">@Model.ErrorMessage</div>
     }
 
     @if (Model.TokenJson != null)
@@ -34,6 +34,16 @@
             <div class="card-header"><strong>Step 2: GET /api/orders</strong> — 取得訂單</div>
             <div class="card-body">
                 <pre class="mb-0"><code>@Model.OrdersJson</code></pre>
+            </div>
+        </div>
+    }
+
+    @if (Model.RefreshJson != null)
+    {
+        <div class="card mb-3">
+            <div class="card-header"><strong>Step 3: POST /api/token/refresh</strong> — 換發 Token</div>
+            <div class="card-body">
+                <pre class="mb-0"><code>@Model.RefreshJson</code></pre>
             </div>
         </div>
     }
